@@ -1,0 +1,391 @@
+<html>
+<head>
+	
+    <title>Orienteering Map of Maps</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="description" content="A map of all orienteering maps in the Wellington Region"> <meta name="author" content="Stuart Engleback">     
+    <link rel="shortcut icon" type="image/x-icon" href="OWLogo.ico" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <link rel="stylesheet" href="leaflet-search.css" />    
+    <!-- <link rel="stylesheet" href="leaflet-easybutton_2.4.0.css" />   -->
+    <link rel="stylesheet" href="L.Control.Layers.Tree.css" />       
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    
+    
+	<style>
+		html, body {	/*background: #e2edee;*/	height: 100%;	margin: 0;}
+		#map {	width: 1000px;	height: 640px;}
+	</style>
+    <style>
+        .info {/*Info Popup*/ padding: 6px 8px; font: 13px/15px Arial, Helvetica, sans-serif; background: rgba(255,255,255,1); box-shadow: 0 0 15px rgba(0,0,0,0.25); border-radius: 5px;} 
+
+        .leaflet-bar a:hover {/*Zoom Control Hover*/	/*background-color: #5c89a788;*/ font-size: 28px; /*color: #080;*/ border-radius: 0px;}
+
+        .leaflet-control-search .search-button {/*Search Button */ background: url('search-icon.png') no-repeat 4px 4px #fff; border-radius: 5px;}
+        .leaflet-control-search .search-button:hover {/*Search Button Hover*/ /*background: url('search-icon.png') no-repeat 4px 4px #5c89a788;*/  border-radius: 4px;}
+
+        .leaflet-control-layers {/*Layers Control*/ background: rgba(255,255,255,1); box-shadow: 0 0 15px rgba(0,0,0,1);}
+        .leaflet-control-layers-expanded {/*Expanded Layers Control*/ color: #000;	background: #fff; line-height:5px; width:114px;}
+        .leaflet-control-layers-separator {/* Layer Separator */ border-top: 2px solid #cacaca;}
+        .leaflet-control-layers-selector{ /* Layer Tickbox */ filter:brightness(90%) contrast(150%) hue-rotate(270deg) grayscale(100%);}
+        .leaflet-control-layers-selector:hover{ /* Layer Tickbox */ opacity:1;}
+
+        .leaflet-container .leaflet-control-search, .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar, .info { /* Outline Of All Buttons */ border: 2px solid #cacaca; border-radius: 5px; }
+        .leaflet-container .leaflet-control-search { opacity:1; /*background:#5c89a788;*/}
+
+        .leaflet-container .leaflet-control-attribution {/*Attribution Box*/ color: #000; background: rgba(255, 255, 255, 0);}
+        .leaflet-control-attribution a {/*Attribution Box Links*/	color: #000;	}   .leaflet-control-attribution a:hover {/*Attribution Box Links*/	color: #f76d22;	}
+        
+        .leaflet-tooltip {/*Name Popup*/ font: 14px Arial; -webkit-text-stroke: 0.35px #000; background: rgba(255, 255, 255, 0.65); color: #000; border-radius: 50px; border: none; box-shadow: none;}
+        .leaflet-tooltip-left:before {/*Name Popup Arrow*/ right: 0; margin-right: -11px; border-left-color: #000;}
+        
+        
+        .toggleIcon{  /* Easy button Toggle */ font-size: 26px;} 
+        .leaflet-bar button:hover {/* Easy button Hover */ background:#5c89a788; border-radius: 3px;}     
+        
+        .leaflet-layerstree-opened, .leaflet-layerstree-closed  {/* Layer Tree */ display: none; color: #f76d22}
+        .leaflet-layerstree-header  {/* Layer Tree Headings */ color: #000}        .leaflet-layerstree-header:hover  { color: #f76d22}
+        .leaflet-layerstree-children label {/* Layer Tree */ color: #444}         .leaflet-layerstree-children label:hover  { color: #f76d22}
+
+    </style>
+</head>
+
+<body>
+    
+<script src="leaflet-search.js"></script>
+<!-- <script src="leaflet-easybutton_2.4.0.js"></script> -->
+<script src="L.Control.Layers.Tree.js"></script> 
+<script type="text/javascript" src="oMaps.js"></script>
+<div id = 'map'></div>
+<script type="text/javascript" >
+
+
+//'<div style="color: #444; font-size: 30px; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -o-transform: rotate(-45deg);transform: rotate(-45deg);"><b>&#9906;</b></div>'
+
+
+// sets toggle state    
+    window.toggle = false;
+
+// Invisible polygon to trigger function
+    var A = L.polygon([[-41.2348, 174.8543],[-41.2348, 174.8563],[-41.2338, 174.8553]],{color: '#0000'})/*.on('add',toggleAllMaps).on('remove',toggleAllMaps)*/;
+   
+// Create layer groups
+    var OW_Maps = L.layerGroup([]),	
+        HV_Maps = L.layerGroup([]),		
+        RK_Maps = L.layerGroup([]),		
+        WR_Maps = L.layerGroup([]),		
+        TK_Maps = L.layerGroup([]),		
+        HB_Maps = L.layerGroup([]),		
+        AK_Maps = L.layerGroup([]),		
+        CM_Maps = L.layerGroup([]),		
+        NW_Maps = L.layerGroup([]),		
+        WH_Maps = L.layerGroup([]),		
+        WK_Maps = L.layerGroup([]),		
+        BP_Maps = L.layerGroup([]),		
+        TA_Maps = L.layerGroup([]),		
+        MA_Maps = L.layerGroup([]),		
+        NE_Maps = L.layerGroup([]),		
+        PP_Maps = L.layerGroup([]),		
+        DU_Maps = L.layerGroup([]),		
+        SO_Maps = L.layerGroup([]),		
+        All_Maps = L.layerGroup([A]);
+
+// Mapbox requirements    
+    var mapboxAttribution = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, ' + 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            mapboxUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+
+// Background maps    
+	var greyscale   = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/light-v9', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
+		streets  = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
+        satellite = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/satellite-streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution});
+    
+// Draw the default map    
+	var map = L.map('map', {center: [-41.238351, 174.853054], zoom: 11, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps]});
+
+// Club layer group tree
+    var layerTree = {    
+        label: '<class = ACC /> <b>All Clubs</b>',
+        selectAllCheckbox: true,
+        children: [{    label: "<class = CN /> <span > <b>Central</b> </span>",
+                        selectAllCheckbox: true,
+                        collapsed: false,
+                        children: [ 
+                                    { label: "<class = OW /> <span style='color:#4381de; font-size:16px'> &#9706 </span> <span> OW Maps </span>", layer: OW_Maps },
+                                    { label: "<class = HV /> <span style='color:#f79e05; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> HV Maps </span>", layer: HV_Maps },
+                                    { label: "<class = RK /> <span style='color:#ff0033; font-size:16px'> &#9706 </span> <span> RK Maps </span>", layer: RK_Maps },
+                                    { label: "<class = WR /> <span style='color:#3ec9ae; font-size:16px'> &#9706 </span> <span> WR Maps </span>", layer: WR_Maps },
+                                    { label: "<class = TK /> <span style='color:#f7dd11; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> TK Maps </span>", layer: TK_Maps },
+                                    { label: "<class = HB /> <span style='color:#71e04f; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> HB Maps </span>", layer: HB_Maps },
+                                ]
+                    },
+                    {   label: "<class = NR /> <span > <b>Northern</b> </span>",
+                        selectAllCheckbox: true,
+                        collapsed: true,
+                        children: [ 
+                                    //   { label: "---", layer: All_Maps},
+                                    { label: "<class = AK /> <span style='color:#9de4fa; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> AK Maps </span>", layer: AK_Maps },
+                                    { label: "<class = CM /> <span style='color:#c20808; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> CM Maps </span>", layer: CM_Maps },
+                                    { label: "<class = NW /> <span style='color:#8c195e; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> NW Maps </span>", layer: NW_Maps },
+                                    { label: "<class = WH /> <span style='color:#423c40; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> WH Maps </span>", layer: WH_Maps },
+                                    { label: "<class = WK /> <span style='color:#594600; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> WK Maps </span>", layer: WK_Maps },
+                                    { label: "<class = BP /> <span style='color:#0a59a3; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> BP Maps </span>", layer: BP_Maps },
+                                    { label: "<class = TA /> <span style='color:#acd4fa; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> TA Maps </span>", layer: TA_Maps },
+                                ]
+                    },
+                    {   label: "<class = ST /> <span > <b>Southern</b> </span>",
+                        selectAllCheckbox: true,
+                        collapsed: true,
+                        children: [ 
+                                    //   { label: "---", layer: All_Maps},
+                                    { label: "<class = MA /> <span style='color:#009463; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> MA Maps </span>", layer: MA_Maps },
+                                    { label: "<class = NE /> <span style='color:#002f5e; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> NE Maps </span>", layer: NE_Maps },
+                                    { label: "<class = PP /> <span style='color:#d90000; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> PP Maps </span>", layer: PP_Maps },
+                                    { label: "<class = DU /> <span style='color:#124acc; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> DU Maps </span>", layer: DU_Maps },
+                                    { label: "<class = SO /> <span style='color:#8fb8b5; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> SO Maps </span>", layer: SO_Maps },
+                                ]
+                    },
+                ]
+        };
+
+// Creates layer control and which layers to include as options
+    var backgroundLayers = { 
+        label: "<class = BS /> <span > <b>Basemaps</b> </span>",
+        children: [ { label: "Greyscale <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: greyscale},
+                    { label: "Streets <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: streets},
+                    { label: "Satellite <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: satellite},]        
+	    };
+	// var mapLayers = {
+    //     "<class = OW /> <span style='color:#4381de; font-size:16px'> &#9706 </span> <span> OW Maps </span>":OW_Maps,
+    //     "<class = HV /> <span style='color:#f79e05; font-size:16px'> &#9706 </span> <span> HV Maps </span>":HV_Maps,
+    //     "<class = RK /> <span style='color:#ff0033; font-size:16px'> &#9706 </span> <span> RK Maps </span>":RK_Maps,
+    //     "<class = WR /> <span style='color:#3ec9ae; font-size:16px'> &#9706 </span> <span> WR Maps </span>":WR_Maps,
+    //     "<class = TK /> <span style='color:#f7dd11; font-size:16px'> &#9706 </span> <span> TK Maps </span>":TK_Maps,
+    //     "<class = HB /> <span style='color:#71e04f; font-size:16px'> &#9706 </span> <span> HB Maps </span>":HB_Maps,
+    //     "<class = AK /> <span style='color:#9de4fa; font-size:16px'> &#9706 </span> <span> AK Maps </span>":AK_Maps,
+    //     "<class = CM /> <span style='color:#c20808; font-size:16px'> &#9706 </span> <span> CM Maps </span>":CM_Maps,
+    //     "<class = NW /> <span style='color:#8c195e; font-size:16px'> &#9706 </span> <span> NW Maps </span>":NW_Maps,
+    //     "<class = WH /> <span style='color:#423c40; font-size:16px'> &#9706 </span> <span> WH Maps </span>":WH_Maps,
+    //     "<class = WK /> <span style='color:#594600; font-size:16px'> &#9706 </span> <span> WK Maps </span>":WK_Maps,
+    //     "<class = BP /> <span style='color:#0a59a3; font-size:16px'> &#9706 </span> <span> BP Maps </span>":BP_Maps,
+    //     "<class = TA /> <span style='color:#acd4fa; font-size:16px'> &#9706 </span> <span> TA Maps </span>":TA_Maps,
+    //     "<class = MA /> <span style='color:#009463; font-size:16px'> &#9706 </span> <span> MA Maps </span>":MA_Maps,
+    //     "<class = NE /> <span style='color:#002f5e; font-size:16px'> &#9706 </span> <span> NE Maps </span>":NE_Maps,
+    //     "<class = PP /> <span style='color:#d90000; font-size:16px'> &#9706 </span> <span> PP Maps </span>":PP_Maps,
+    //     "<class = DU /> <span style='color:#124acc; font-size:16px'> &#9706 </span> <span> DU Maps </span>":DU_Maps,
+    //     "<class = SO /> <span style='color:#8fb8b5; font-size:16px'> &#9706 </span> <span> SO Maps </span>":SO_Maps,
+    //     "<class = AM /> <span style='color:#ffffff; font-size:16px'> &#9706 </span> <span> All Clubs </span>": All_Maps
+	// };
+	// L.control.layers(null, mapLayers, { position: 'bottomright', collapsed: true }).addTo(map);
+    L.control.layers.tree(backgroundLayers, layerTree,{ collapsed: false }).addTo(map);
+
+
+// Add OW logo to corner    
+    L.Control.Watermark = L.Control.extend({
+        onAdd: function(map) {
+            var img = L.DomUtil.create('img');
+            img.src = 'OWLogo.png';
+            img.style.width = '200px';
+            return img;     
+        },
+        onRemove: function(map) {  /*Nothing to do here*/    }	});
+    L.control.watermark = function(opts) {	return new L.Control.Watermark(opts);}
+    L.control.watermark({ position: 'bottomleft' }).addTo(map);
+
+// Get colour depending on club value
+function getClubColour(d) {
+                // Central
+        return  d == "OW"   ?   '#4381de' :
+                d == "HV"   ?   '#f79e05' :
+                d == "RK"   ?   '#ff0033' :
+                d == "WR"   ?   '#3ec9ae' :
+                d == "TK"   ?   '#f7dd11' :
+                d == "HB"   ?   '#71e04f' :
+                // Northern
+                d == "AK"   ?   '#9de4fa' :
+                d == "CM"   ?   '#c20808' :
+                d == "NW"   ?   '#8c195e' :
+                d == "WH"   ?   '#423c40' :
+                d == "WK"   ?   '#594600' :
+                d == "BP"   ?   '#0a59a3' :
+                d == "TA"   ?   '#acd4fa' :
+                // Southern
+                d == "MA"   ?   '#009463' :
+                d == "NE"   ?   '#002f5e' :
+                d == "PP"   ?   '#d90000' :
+                d == "DU"   ?   '#124acc' :
+                d == "SO"   ?   '#8fb8b5' :
+                                '#000000';
+    }
+
+// Get full name depending on club value
+function getClubName(d) {
+                // Central
+        return  d == "OW"   ?   'Orienteering Wellington' :
+                d == "HV"   ?   'Orienteering Hutt Valley' :
+                d == "RK"   ?   'Red Kiwi Orienteers' :
+                d == "WR"   ?   'Wairarapa Orienteers' :
+                d == "TK"   ?   'Orienteering Taranaki' :
+                d == "HB"   ?   'Hawkes Bay Orienteering Club' :
+                // Northern
+                d == "AK"   ?   'Auckland Orienteers' :
+                d == "CM"   ?   'Counties Manukau Orienteering Club' :
+                d == "NW"   ?   'North West Orienteering Club' :
+                d == "WH"   ?   'Whangarei Orienteering' :
+                d == "WK"   ?   'Orienteering Waikato' :
+                d == "BP"   ?   'Orienteering Bay of Plenty' :
+                d == "TA"   ?   'Taupo Orienteering Club' :
+                // Southern
+                d == "MA"   ?   'Marlborough Orienteering' :
+                d == "NE"   ?   'Nelson Orienteering Club' :
+                d == "PP"   ?   'Peninsula and Plains Orienteering' :
+                d == "DU"   ?   'Dunedin Orienteering ' :
+                d == "SO"   ?   'Southland Orienteering Club' :
+                                'None';
+    }
+
+// Assign each polygon to a club layer group
+    function assignClub(d,e) {
+                // Central
+                d == "OW"   ?   OW_Maps.addLayer(e) :
+                d == "HV"   ?   HV_Maps.addLayer(e) :
+                d == "RK"   ?   RK_Maps.addLayer(e) :
+                d == "WR"   ?   WR_Maps.addLayer(e) :
+                d == "TK"   ?   TK_Maps.addLayer(e) :
+                d == "HB"   ?   HB_Maps.addLayer(e) :
+                // Northern
+                d == "AK"   ?   AK_Maps.addLayer(e) :
+                d == "CM"   ?   CM_Maps.addLayer(e) :
+                d == "NW"   ?   NW_Maps.addLayer(e) :
+                d == "WH"   ?   WH_Maps.addLayer(e) :
+                d == "WK"   ?   WK_Maps.addLayer(e) :
+                d == "BP"   ?   BP_Maps.addLayer(e) :
+                d == "TA"   ?   TA_Maps.addLayer(e) :
+                // Southern
+                d == "MA"   ?   MA_Maps.addLayer(e) :
+                d == "NE"   ?   NE_Maps.addLayer(e) :
+                d == "PP"   ?   PP_Maps.addLayer(e) :
+                d == "DU"   ?   DU_Maps.addLayer(e) :
+                d == "SO"   ?   SO_Maps.addLayer(e) :
+                                All_Maps.addLayer(e);
+    }
+
+// Style each polygon
+    function polygonStyle(feature) {
+        if (feature.properties.map_state == 'Discontinued'){
+            return {
+                    fillOpacity: 0.6, 
+                    weight:1.7,
+                    color: getClubColour(feature.properties.club), 
+                    fillColor: '#CCCCCC99' 
+                    
+                };
+            }
+        else{
+            return {
+                fillOpacity: 0.6, 
+                weight:1.7,
+                color: getClubColour(feature.properties.club), 
+                fillColor: getClubColour(feature.properties.club), 
+                
+            };
+        }
+    }
+
+// Displays the information for each map
+    var info = L.control({position: 'bottomright'});
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info');
+        this.update();
+        return this._div;
+    };
+    info.update = function (props) {
+        this._div.innerHTML = (props ? '<b>' + props.name + '</b><br />' 
+            + 'Map Owner: ' + getClubName(props.club) + '<br />'
+            + 'Terrain: ' + props.terrain + '<br />' 
+            + 'Map State: ' + props.map_state + '<br />' 
+            + 'Alternate Name(s): ' + props.alternate_name + '<br />'  
+            : '&#9706');
+    }; 
+    info.addTo(map);
+    
+
+// Highlights displays info for the layer under the mouse
+    function highlightFeature(e) {
+        var layer = e.target;
+        layer.openTooltip()
+        layer.setStyle({
+            weight: 4,
+            color: '#fff',
+            fillOpacity: 0.6
+        });
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        } // stops border from overlapping
+        info.update(layer.feature.properties);
+    }
+
+// Turns off the highlight
+    var geojson; // makes empty variable
+    function resetHighlight(e) {
+        geojson.resetStyle(e.target);
+        info.update();
+    }
+ 
+// Zooms to feature when clicked
+    function zoomToFeature(e) {
+        //map.fitBounds(e.target.getBounds(),{padding: [200,200]});
+        latilong = e.target.getBounds().getCenter();
+        map.setView(latilong, 14);
+    }
+
+// Tasks to do to each feature on creation
+    function onEachFeature(feature, layer) {
+        layer.bindTooltip((feature.properties.name),{direction:"left"})
+        assignClub((feature.properties.club),layer)
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: zoomToFeature,
+        });        
+    }
+
+// Create each feature    
+    geojson = L.geoJson(mapsData, { 
+        style: polygonStyle,
+        onEachFeature: onEachFeature
+    }).addTo(map);
+
+// Adds tag at bottom of map
+    map.attributionControl.addAttribution('Map updated 21/10/2021, Created by Stuart Engleback. Information displayed is not necessarily authoritative ');
+    
+// Create search button    
+    var searchControl = new L.Control.Search({  
+            position: 'topleft',
+            layer: geojson,
+            propertyName: ('all_names'),
+            initial: false,
+		    zoom: 14,
+		    marker: false,            
+        }).addTo(map);
+   
+// Create all layers toggle
+    function toggleAllMaps() {
+        if(!toggle) {
+            setTimeout(function() {
+                map.addLayer(OW_Maps), map.addLayer(HV_Maps), map.addLayer(RK_Maps), map.addLayer(WR_Maps), map.addLayer(TK_Maps), map.addLayer(HB_Maps), map.addLayer(AK_Maps), map.addLayer(CM_Maps), map.addLayer(NW_Maps), map.addLayer(WH_Maps), map.addLayer(WK_Maps), map.addLayer(BP_Maps), map.addLayer(TA_Maps), map.addLayer(MA_Maps), map.addLayer(NE_Maps), map.addLayer(PP_Maps), map.addLayer(DU_Maps), map.addLayer(SO_Maps)/*, map.addLayer(All_Maps)*/;
+            }, 10);} 
+        else {
+            setTimeout(function() {
+                map.removeLayer(OW_Maps), map.removeLayer(HV_Maps), map.removeLayer(RK_Maps), map.removeLayer(WR_Maps), map.removeLayer(TK_Maps), map.removeLayer(HB_Maps), map.removeLayer(AK_Maps), map.removeLayer(CM_Maps), map.removeLayer(NW_Maps), map.removeLayer(WH_Maps), map.removeLayer(WK_Maps), map.removeLayer(BP_Maps), map.removeLayer(TA_Maps), map.removeLayer(MA_Maps), map.removeLayer(NE_Maps), map.removeLayer(PP_Maps), map.removeLayer(DU_Maps), map.removeLayer(SO_Maps)/*, map.removeLayer(All_Maps)*/;
+            }, 10);}
+        toggle = !toggle;
+    }
+    
+// // Create snowman button
+//     L.easyButton( '<div style="color: #444; font-size: 30px; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -o-transform: rotate(-45deg);transform: rotate(-45deg);"><b>&#9906;</b></div>', function(){
+//          window.open("https://wellingtonorienteering.org.nz/");
+//     },{ position: 'bottomright'}).addTo(map);
+</script>
+
+</body>
+</html>
