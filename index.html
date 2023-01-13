@@ -111,7 +111,7 @@
                         collapsed: false,
                         children: [ 
                                     { label: "<class = OW /> <span style='color:#4381de; font-size:16px'> &#9706 </span> <span> OW Maps </span>", layer: OW_Maps },
-                                    { label: "<class = HV /> <span style='color:#f79e05; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> HV Maps </span>", layer: HV_Maps },
+                                    { label: "<class = HV /> <span style='color:#f79e05; font-size:16px'> &#9706 </span> <span style=' color:#000;'> HV Maps </span>", layer: HV_Maps },
                                     { label: "<class = RK /> <span style='color:#ff0033; font-size:16px'> &#9706 </span> <span> RK Maps </span>", layer: RK_Maps },
                                     { label: "<class = WR /> <span style='color:#3ec9ae; font-size:16px'> &#9706 </span> <span> WR Maps </span>", layer: WR_Maps },
                                     { label: "<class = TK /> <span style='color:#f7dd11; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> TK Maps </span>", layer: TK_Maps },
@@ -185,6 +185,7 @@
             var img = L.DomUtil.create('img');
             img.src = 'OWLogo.png';
             img.style.width = '200px';
+            img.style.opacity = '0.0';
             return img;     
         },
         onRemove: function(map) {  /*Nothing to do here*/    }	});
@@ -356,7 +357,7 @@ function getClubName(d) {
     }).addTo(map);
 
 // Adds tag at bottom of map
-    map.attributionControl.addAttribution('Map updated 21/10/2021, Created by Stuart Engleback. Information displayed is not necessarily authoritative ');
+    map.attributionControl.addAttribution('Map updated 13/01/2023, Created by Stuart Engleback. Information displayed is not necessarily authoritative ');
     
 // Create search button    
     var searchControl = new L.Control.Search({  
