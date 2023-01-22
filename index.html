@@ -100,7 +100,7 @@
         satellite = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/satellite-streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution});
     
 // Draw the default map    
-	var map = L.map('map', {center: [-41.238351, 174.853054], zoom: 11, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps]});
+	var map = L.map('map', {center: [-41.238351, 174.853054], zoom: 10, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps,PP_Maps]});
 
 // Club layer group tree
     var layerTree = {    
