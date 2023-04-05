@@ -109,7 +109,6 @@
             defaultLat = -43.35;
             defaultLng = 172.4;
             defaultZoom = 10;
-            console.log("PP")
             break;
         default:
             defaultLat = -41.238351;
@@ -121,7 +120,6 @@
 
 
 // Draw the default map    
-    console.log(defaultLat, defaultLng, defaultZoom)
 	var map = L.map('map', {center: [defaultLat, defaultLng], zoom: defaultZoom, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps,PP_Maps]});
 
 // Club layer group tree
