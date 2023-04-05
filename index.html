@@ -98,9 +98,31 @@
 	var greyscale   = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/light-v9', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
 		streets  = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
         satellite = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/satellite-streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution});
-    
+
+    const queryUrl = window.location.search;
+    const club = new URLSearchParams(queryUrl).get('club');
+
+    let defaultLat, defaultLng, defaultZoom;
+
+    switch(club) {
+        case 'PP':
+            defaultLat = -43.35;
+            defaultLng = 172.4;
+            defaultZoom = 10;
+            console.log("PP")
+            break;
+        default:
+            defaultLat = -41.238351;
+            defaultLng = 174.853054;
+            defaultZoom = 11;
+            break;
+
+    }
+
+
 // Draw the default map    
-	var map = L.map('map', {center: [-41.238351, 174.853054], zoom: 11, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps]});
+    console.log(defaultLat, defaultLng, defaultZoom)
+	var map = L.map('map', {center: [defaultLat, defaultLng], zoom: defaultZoom, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps,PP_Maps]});
 
 // Club layer group tree
     var layerTree = {    
