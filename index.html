@@ -1,9 +1,9 @@
 <html>
 <head>
 	
-    <title>Orienteering Map of Maps</title>
+    <title>Orienteering Map Locations</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="description" content="A map of all orienteering maps in the NZ"> <meta name="author" content="Stuart Engleback">     
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="description" content="A map of all orienteering maps in the Wellington Region"> <meta name="author" content="Stuart Engleback">     
     <link rel="shortcut icon" type="image/x-icon" href="OWLogo.ico" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
     <link rel="stylesheet" href="leaflet-search.css" />    
@@ -98,9 +98,29 @@
 	var greyscale   = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 17, minZoom: 4, id: 'mapbox/light-v9', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
 		streets  = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
         satellite = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/satellite-streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution});
-    
+
+    const queryUrl = window.location.search;
+    const club = new URLSearchParams(queryUrl).get('club');
+
+    let defaultLat, defaultLng, defaultZoom;
+
+    switch(club) {
+        case 'PP':
+            defaultLat = -43.35;
+            defaultLng = 172.4;
+            defaultZoom = 10;
+            break;
+        default:
+            defaultLat = -41.238351;
+            defaultLng = 174.853054;
+            defaultZoom = 11;
+            break;
+
+    }
+
+
 // Draw the default map    
-	var map = L.map('map', {center: [-41.238351, 174.853054], zoom: 10, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps,PP_Maps]});
+	var map = L.map('map', {center: [defaultLat, defaultLng], zoom: defaultZoom, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps,PP_Maps]});
 
 // Club layer group tree
     var layerTree = {    
@@ -111,7 +131,7 @@
                         collapsed: false,
                         children: [ 
                                     { label: "<class = OW /> <span style='color:#4381de; font-size:16px'> &#9706 </span> <span> OW Maps </span>", layer: OW_Maps },
-                                    { label: "<class = HV /> <span style='color:#f79e05; font-size:16px'> &#9706 </span> <span style=' color:#000;'> HV Maps </span>", layer: HV_Maps },
+                                    { label: "<class = HV /> <span style='color:#f79e05; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> HV Maps </span>", layer: HV_Maps },
                                     { label: "<class = RK /> <span style='color:#ff0033; font-size:16px'> &#9706 </span> <span> RK Maps </span>", layer: RK_Maps },
                                     { label: "<class = WR /> <span style='color:#3ec9ae; font-size:16px'> &#9706 </span> <span> WR Maps </span>", layer: WR_Maps },
                                     { label: "<class = TK /> <span style='color:#f7dd11; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> TK Maps </span>", layer: TK_Maps },
@@ -139,7 +159,7 @@
                                     //   { label: "---", layer: All_Maps},
                                     { label: "<class = MA /> <span style='color:#009463; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> MA Maps </span>", layer: MA_Maps },
                                     { label: "<class = NE /> <span style='color:#002f5e; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> NE Maps </span>", layer: NE_Maps },
-                                    { label: "<class = PP /> <span style='color:#d90000; font-size:16px'> &#9706 </span> <span style=' color:#000;'> PP Maps </span>", layer: PP_Maps },
+                                    { label: "<class = PP /> <span style='color:#d90000; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> PP Maps </span>", layer: PP_Maps },
                                     { label: "<class = DU /> <span style='color:#124acc; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> DU Maps </span>", layer: DU_Maps },
                                     { label: "<class = SO /> <span style='color:#8fb8b5; font-size:16px'> &#9706 </span> <span style=' color:#ddd;'> SO Maps </span>", layer: SO_Maps },
                                 ]
@@ -185,7 +205,6 @@
             var img = L.DomUtil.create('img');
             img.src = 'OWLogo.png';
             img.style.width = '200px';
-            img.style.opacity = '0.0';
             return img;     
         },
         onRemove: function(map) {  /*Nothing to do here*/    }	});
@@ -304,7 +323,12 @@ function getClubName(d) {
             + 'Map Owner: ' + getClubName(props.club) + '<br />'
             + 'Terrain: ' + props.terrain + '<br />' 
             + 'Map State: ' + props.map_state + '<br />' 
-            + 'Alternate Name(s): ' + props.alternate_name + '<br />'  
+            + 'Alternate Name(s): ' + props.alternate_name + '<br />'
+            + (
+                props.image_id
+                ? 'Map Sample: <br /><img src="images/samples/' + props.image_id + '.png" alt="Map Image" width="200" height="200" />'
+                : ''
+            )
             : '&#9706');
     }; 
     info.addTo(map);
@@ -357,7 +381,7 @@ function getClubName(d) {
     }).addTo(map);
 
 // Adds tag at bottom of map
-    map.attributionControl.addAttribution('Map updated 13/01/2023, Created by Stuart Engleback. Information displayed is not necessarily authoritative ');
+    map.attributionControl.addAttribution('Map updated 11/10/2022, Created by Stuart Engleback. Information displayed is not necessarily authoritative ');
     
 // Create search button    
     var searchControl = new L.Control.Search({  
