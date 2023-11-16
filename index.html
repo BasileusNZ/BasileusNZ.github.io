@@ -25,7 +25,7 @@
         .leaflet-control-search .search-button:hover {/*Search Button Hover*/ /*background: url('search-icon.png') no-repeat 4px 4px #5c89a788;*/  border-radius: 4px;}
 
         .leaflet-control-layers {/*Layers Control*/ background: rgba(255,255,255,1); box-shadow: 0 0 15px rgba(0,0,0,1);}
-        .leaflet-control-layers-expanded {/*Expanded Layers Control*/ color: #000;	background: #fff; line-height:5px; width:114px;}
+        .leaflet-control-layers-expanded {/*Expanded Layers Control*/ color: #000;	background: #fff; line-height:5px; width:120px;}
         .leaflet-control-layers-separator {/* Layer Separator */ border-top: 2px solid #cacaca;}
         .leaflet-control-layers-selector{ /* Layer Tickbox */ filter:brightness(90%) contrast(150%) hue-rotate(270deg) grayscale(100%);}
         .leaflet-control-layers-selector:hover{ /* Layer Tickbox */ opacity:1;}
@@ -46,6 +46,14 @@
         .leaflet-layerstree-opened, .leaflet-layerstree-closed  {/* Layer Tree */ display: none; color: #f76d22}
         .leaflet-layerstree-header  {/* Layer Tree Headings */ color: #000}        .leaflet-layerstree-header:hover  { color: #f76d22}
         .leaflet-layerstree-children label {/* Layer Tree */ color: #444}         .leaflet-layerstree-children label:hover  { color: #f76d22}
+
+        /* Media query for screens smaller than 768px */
+        @media screen and (max-width: 1000px) {
+            /* Hide the attribution at smaller screen sizes */
+            .leaflet-control-attribution {
+                display: none;
+            }
+        }
 
     </style>
 </head>
@@ -91,13 +99,17 @@
         All_Maps = L.layerGroup([A]);
 
 // Mapbox requirements    
-    var mapboxAttribution = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, ' + 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            mapboxUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+ //   var mapboxAttribution = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, ' + 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+ //           mapboxUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
 
 // Background maps    
-	var greyscale   = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 17, minZoom: 4, id: 'mapbox/light-v9', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
-		streets  = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
-        satellite = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/satellite-streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution});
+	var osm   = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        opacity: 0.75
+    });
+	//streets  = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution}),
+    //satellite = L.tileLayer(mapboxUrl, {maxZoom: 17, minZoom: 4, id: 'mapbox/satellite-streets-v11', tileSize: 512, zoomOffset: -1, attribution: mapboxAttribution});
 
     const queryUrl = window.location.search;
     const club = new URLSearchParams(queryUrl).get('club');
@@ -120,7 +132,7 @@
 
 
 // Draw the default map    
-	var map = L.map('map', {center: [defaultLat, defaultLng], zoom: defaultZoom, layers: [greyscale, OW_Maps,HV_Maps,RK_Maps,WR_Maps,PP_Maps]});
+	var map = L.map('map', {center: [defaultLat, defaultLng], zoom: defaultZoom, layers: [osm, OW_Maps,HV_Maps,RK_Maps,WR_Maps,PP_Maps]});
 
 // Club layer group tree
     var layerTree = {    
@@ -170,9 +182,10 @@
 // Creates layer control and which layers to include as options
     var backgroundLayers = { 
         label: "<class = BS /> <span > <b>Basemaps</b> </span>",
-        children: [ { label: "Greyscale <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: greyscale},
-                    { label: "Streets <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: streets},
-                    { label: "Satellite <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: satellite},]        
+        children: [ { label: "OSM <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: osm},
+                   // { label: "Streets <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: streets},
+                   // { label: "Satellite <span style='color:#ffffff; font-size:16px'> &#9706 </span>", layer: satellite},
+                ]        
 	    };
 	// var mapLayers = {
     //     "<class = OW /> <span style='color:#4381de; font-size:16px'> &#9706 </span> <span> OW Maps </span>":OW_Maps,
@@ -196,8 +209,26 @@
     //     "<class = AM /> <span style='color:#ffffff; font-size:16px'> &#9706 </span> <span> All Clubs </span>": All_Maps
 	// };
 	// L.control.layers(null, mapLayers, { position: 'bottomright', collapsed: true }).addTo(map);
-    L.control.layers.tree(backgroundLayers, layerTree,{ collapsed: false }).addTo(map);
+    let layerControl = L.control.layers.tree(backgroundLayers, layerTree,{ collapsed: false }).addTo(map);
 
+    // Function to handle resizing and adjusting the layer control
+    function adjustLayerControl() {
+        const screenWidth = window.innerWidth;
+
+        if (screenWidth < 768) {
+            // Collapse the layer control
+            layerControl.collapse();
+        } else {
+            // Expand the layer control
+            layerControl.expand();
+        }
+    }
+
+    // Initially adjust the layer control based on the screen size
+    adjustLayerControl();
+
+    // Listen for window resize events
+    window.addEventListener('resize', adjustLayerControl);
 
 // Add OW logo to corner    
     L.Control.Watermark = L.Control.extend({
