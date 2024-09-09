@@ -5735,7 +5735,7 @@ var mapsData = {
         terrain: "Forest/Dunes",
         club: "PP",
         alternate_name: "",
-        map_state: "Available",
+        map_state: "Embargoed",
         all_names: "Leithfield",
         image_id: "leithfield",
       },
