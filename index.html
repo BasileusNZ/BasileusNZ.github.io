@@ -231,7 +231,7 @@ function getClubColour(d) {
                 // Southern
                 d == "MA"   ?   '#009463' :
                 d == "NE"   ?   '#002f5e' :
-                d == "PP"   ?   '#d90000' :
+                d == "PP"   ?   '#c00000' :
                 d == "DU"   ?   '#124acc' :
                 d == "SO"   ?   '#8fb8b5' :
                                 '#000000';
@@ -293,20 +293,27 @@ function getClubName(d) {
     function polygonStyle(feature) {
         if (feature.properties.map_state == 'Discontinued'){
             return {
-                    fillOpacity: 0.6, 
+                    fillOpacity: 0.5, 
                     weight:1.7,
                     color: getClubColour(feature.properties.club), 
-                    fillColor: '#CCCCCC99' 
+                    fillColor: '#CCCCCC' 
                     
                 };
             }
+        else if (feature.properties.map_state == 'Embargoed'){
+            return {
+                fillOpacity: 0.90, 
+                weight:1.7,
+                color: getClubColour(feature.properties.club), 
+                fillColor: '#FF1A1A' 
+            };
+        }
         else{
             return {
                 fillOpacity: 0.6, 
                 weight:1.7,
                 color: getClubColour(feature.properties.club), 
                 fillColor: getClubColour(feature.properties.club), 
-                
             };
         }
     }
